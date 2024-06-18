@@ -1,24 +1,36 @@
+# Importing necessary libraries
 import pandas as pd
 import matplotlib.pyplot as plt
-import yfinance as yf
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-stock_symbol = "AAPL"  
-start_date = "2020-01-01"
-end_date = "2021-01-01"
-ts_data = yf.download(stock_symbol, start=start_date, end=end_date)
+# Load the dataset
+url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv'
+df = pd.read_csv(url)
 
-# Plot opening prices
-plt.figure(figsize=(10, 6))
-plt.plot(ts_data.index, ts_data['Open'])
-plt.ylabel("Price")
-plt.xlabel("Date")
-plt.title("Opening Price of the Stocks")
-plt.xticks(rotation=45)
-plt.xlim(ts_data.index.min(), ts_data.index.max())
+# Check for missing values
+print(df.isnull().sum())
+
+# Fill missing values with linear interpolation
+df['Passengers'] = df['Passengers'].interpolate(method='linear')
+
+# Convert the 'Month' column to datetime
+df['Month'] = pd.to_datetime(df['Month'])
+
+# Set the 'Month' column as the index
+df.set_index('Month', inplace=True)
+
+# Plot the time series data
+plt.figure(figsize=(10, 5))
+plt.plot(df.index, df['Passengers'], label='Passengers')
+plt.xlabel('Time')
+plt.ylabel('Number of Passengers')
+plt.title('Monthly Number of Air Passengers')
+plt.legend()
 plt.show()
 
-# Decompose and plot
-decompose_result = seasonal_decompose(ts_data['Open'], model='multiplicative', period=30)
-decompose_result.plot()
+# Decompose the time series
+result = seasonal_decompose(df['Passengers'], model='multiplicative')
+
+# Plot the decomposition
+result.plot()
 plt.show()
