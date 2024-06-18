@@ -1,12 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import yfinance as yf
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-# Load and inspect data
-data = pd.read_csv("/content/yahoo_stock (1).csv")
-ts_data = data[['Date', 'Open']]
-ts_data['Date'] = pd.to_datetime(ts_data['Date'], format="%Y-%m-%d")
-ts_data.set_index('Date', inplace=True)
+stock_symbol = "AAPL"  
+start_date = "2020-01-01"
+end_date = "2021-01-01"
+ts_data = yf.download(stock_symbol, start=start_date, end=end_date)
 
 # Plot opening prices
 plt.figure(figsize=(10, 6))
@@ -19,6 +19,6 @@ plt.xlim(ts_data.index.min(), ts_data.index.max())
 plt.show()
 
 # Decompose and plot
-decompose_result = seasonal_decompose(ts_data['Open'], model='multiplicative', period=363)
+decompose_result = seasonal_decompose(ts_data['Open'], model='multiplicative', period=30)
 decompose_result.plot()
 plt.show()
